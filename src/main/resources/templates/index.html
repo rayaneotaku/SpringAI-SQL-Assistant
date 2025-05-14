@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI SQL Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --background-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --border-radius: 12px;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding-bottom: 2rem;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 6px 18px rgba(67, 97, 238, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0.6;
+            z-index: 0;
+        }
+
+        .app-header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .examples-container {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            margin-bottom: 1rem;
+        }
+
+        .example-chip {
+            background-color: #e7efff;
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(67, 97, 238, 0.2);
+        }
+
+        .example-chip:hover {
+            background-color: #d1e0ff;
+            transform: scale(1.05);
+        }
+
+        .query-input-container {
+            position: relative;
+        }
+
+        .query-input {
+            padding-right: 50px;
+            border-radius: 50px;
+            border: 2px solid #e2e8f0;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .query-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+        }
+
+        .submit-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 0 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .results-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: none; /* Initially hidden */
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+            border: 4px solid rgba(67, 97, 238, 0.1);
+            border-radius: 50%;
+            border-left-color: var(--primary-color);
+            animation: spin 1s ease infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .sql-section {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .sql-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .sql-code {
+            background-color: #282c34;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 4px;
+            color: white;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+        }
+
+        .result-table thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .result-table th {
+            padding: 1rem;
+            font-weight: 600;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+
+        .result-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .result-table tbody tr:hover {
+            background-color: #f1f5ff;
+        }
+
+        .result-info {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .error-message {
+            background-color: #ffecef;
+            border-left: 4px solid #ff5c7c;
+            color: #e6123d;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* History sidebar */
+        .history-container {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background-color: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .history-container.active {
+            right: 0;
+        }
+
+        .history-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background-color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .history-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background-color: #f1f5ff;
+        }
+
+        .history-question {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .history-sql {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .database-schema-toggle {
+            background-color: #e7efff;
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(67, 97, 238, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .database-schema-toggle:hover {
+            background-color: #d1e0ff;
+        }
+
+        .schema-container {
+            display: none;
+            background-color: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .schema-table {
+            margin-bottom: 1rem;
+        }
+
+        .schema-table-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .schema-columns {
+            margin-left: 1.5rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001;
+            background-color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* Dark mode */
+        body.dark-mode {
+            --background-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e2e8f0;
+        }
+
+        body.dark-mode .form-card,
+        body.dark-mode .results-card {
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode .query-input {
+            background-color: #2d2d2d;
+            border-color: #3d3d3d;
+            color: white;
+        }
+
+        body.dark-mode .example-chip {
+            background-color: #2d2d2d;
+            border-color: #3d3d3d;
+        }
+
+        body.dark-mode .result-table tbody tr:hover {
+            background-color: #2d2d2d;
+        }
+
+        body.dark-mode .error-message {
+            background-color: rgba(255, 92, 124, 0.1);
+        }
+
+        body.dark-mode .history-container,
+        body.dark-mode .theme-toggle,
+        body.dark-mode .history-toggle {
+            background-color: #1e1e1e;
+            color: white;
+        }
+
+        body.dark-mode .schema-container {
+            background-color: #2d2d2d;
+            border-color: #3d3d3d;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .app-header {
+                padding: 1.5rem;
+            }
+            .form-card, .results-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="app-header">
+        <div class="app-header-content">
+            <h1 class="text-center mb-3"><i class="bi bi-database-fill me-2"></i>AI SQL Assistant</h1>
+            <p class="lead text-center">Ask a question in natural language, and AI will generate and execute a SQL query</p>
+            <p class="lead text-center">Results are fetched directly from a real ai_services table in PostgreSQL</p>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <form th:action="@{/ask}" method="post" id="queryForm">
+            <div class="mb-3 query-input-container">
+                <label for="question" class="form-label"><i class="bi bi-chat-left-text me-1"></i>Your question:</label>
+                <input type="text" class="form-control query-input" id="question" name="question"
+                       th:value="${question}" required
+                       placeholder="Example: Which AI models are available">
+                <button type="submit" class="submit-btn">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </div>
+
+            <div class="database-schema-toggle" id="schemaToggle">
+                <i class="bi bi-table"></i> Show the structure of the database
+            </div>
+            <div class="schema-container" id="schemaContainer">
+                <div class="schema-table">
+                    <div class="schema-table-name"><i class="bi bi-robot"></i> ai_services</div>
+                    <div class="schema-columns">
+                        id (INT), name (VARCHAR), provider (VARCHAR), model (VARCHAR), type (VARCHAR),
+                        input_price_per_1k_tokens (DECIMAL), output_price_per_1k_tokens (DECIMAL),
+                        supports_sql (BOOLEAN), max_tokens (INT), context_window (VARCHAR), available (BOOLEAN),
+                        launched_at (DATE), description (TEXT)
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <h6 class="mb-2">Example questions:</h6>
+                <div class="examples-container">
+                    <div class="example-chip">Show all OpenAI models with price less than 0.01</div>
+                    <div class="example-chip">List all models that support SQL</div>
+                    <div class="example-chip">Top 3 cheapest models by output price</div>
+                    <div class="example-chip">Models launched after 2023</div>
+                    <div class="example-chip">Group models by provider</div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="loading" id="loadingIndicator">
+        <div class="spinner"></div>
+        <p class="mt-3">SQL generation and request ...</p>
+    </div>
+
+    <div class="error-message" id="errorContainer" th:if="${error}" th:text="${error}"></div>
+
+    <div class="results-card" id="resultsContainer" th:if="${sql != null || headers != null}">
+        <div class="sql-section" th:if="${sql}">
+            <div class="sql-header">
+                <h4><i class="bi bi-code-slash text-primary me-1"></i>Generated SQL:</h4>
+                <span class="badge bg-primary">SQL</span>
+            </div>
+            <div class="sql-code">
+                <button class="copy-btn" onclick="copySQL()"><i class="bi bi-clipboard"></i> Copy</button>
+                <pre><code class="language-sql" id="sqlCode" th:text="${sql}"></code></pre>
+            </div>
+        </div>
+
+        <div class="result-section" th:if="${headers != null}">
+            <h4 class="mb-3"><i class="bi bi-table text-primary me-1"></i>Query Results:</h4>
+            <div class="table-container">
+                <table class="table result-table">
+                    <thead>
+                    <tr>
+                        <th th:each="header : ${headers}" th:text="${header}"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${rows}">
+                        <td th:each="cell : ${row}" th:text="${cell}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="result-info">
+                <i class="bi bi-info-circle"></i>
+                <span th:text="${rows.size()} + ' records found'"></span>
+                <span class="ms-2" th:if="${executionTime}" th:text="'Executed in ' + ${executionTime} + ' ms.'"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button class="history-toggle" id="historyToggle">
+    <i class="bi bi-clock-history"></i>
+</button>
+
+<div class="history-container" id="historyContainer">
+    <h5>History</h5>
+    <div class="history-list">
+    </div>
+</div>
+
+<button class="theme-toggle" id="themeToggle">
+    <i class="bi bi-moon"></i>
+</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/sql.min.js"></script>
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const sqlCode = document.getElementById('sqlCode');
+        if (sqlCode) {
+            hljs.highlightElement(sqlCode);
+            document.getElementById('resultsContainer').style.display = 'block';
+        }
+
+        const errorContainer = document.getElementById('errorContainer');
+        if (errorContainer && errorContainer.textContent.trim() !== '') {
+            errorContainer.style.display = 'block';
+        }
+    });
+
+    document.getElementById('queryForm').addEventListener('submit', function() {
+        document.getElementById('loadingIndicator').style.display = 'block';
+
+        const question = document.getElementById('question').value;
+        if (question.trim() !== '') {
+            saveQueryToHistory(question, '-- The request is executed...');
+        }
+    });
+
+    function copySQL() {
+        const sqlCode = document.getElementById('sqlCode');
+        if (sqlCode) {
+            navigator.clipboard.writeText(sqlCode.textContent).then(function() {
+                const copyBtn = document.querySelector('.copy-btn');
+                copyBtn.innerHTML = '<i class="bi bi-check"></i> Copied';
+                setTimeout(function() {
+                    copyBtn.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
+                }, 2000);
+            });
+        }
+    }
+
+    document.querySelectorAll('.example-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            document.getElementById('question').value = this.textContent;
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.classList.add('pulse-animation');
+            setTimeout(function() {
+                submitBtn.classList.remove('pulse-animation');
+            }, 2000);
+        });
+    });
+
+    document.getElementById('schemaToggle').addEventListener('click', function() {
+        const schemaContainer = document.getElementById('schemaContainer');
+        if (schemaContainer.style.display === 'block') {
+            schemaContainer.style.display = 'none';
+            this.innerHTML = '<i class="bi bi-table"></i> Show database structure';
+        } else {
+            schemaContainer.style.display = 'block';
+            this.innerHTML = '<i class="bi bi-table"></i> Hide database structure';
+        }
+    });
+
+    document.getElementById('historyToggle').addEventListener('click', function() {
+        const historyContainer = document.getElementById('historyContainer');
+        historyContainer.classList.toggle('active');
+    });
+
+    document.getElementById('themeToggle').addEventListener('click', function() {
+        document.body.classList.toggle('dark-mode');
+        const icon = this.querySelector('i');
+        if (document.body.classList.contains('dark-mode')) {
+            icon.className = 'bi bi-sun';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            icon.className = 'bi bi-moon';
+            localStorage.setItem('theme', 'light');
+        }
+    });
+
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.querySelector('#themeToggle i').className = 'bi bi-sun';
+    }
+
+    function saveQueryToHistory(question, sql) {
+        const history = getHistoryFromStorage();
+        history.unshift({
+            question: question,
+            sql: sql,
+            timestamp: new Date().toISOString()
+        });
+
+        if (history.length > 10) {
+            history.pop();
+        }
+
+        localStorage.setItem('queryHistory', JSON.stringify(history));
+        updateHistoryUI();
+    }
+
+    function getHistoryFromStorage() {
+        const historyStr = localStorage.getItem('queryHistory');
+        return historyStr ? JSON.parse(historyStr) : [];
+    }
+
+    function updateHistoryUI() {
+        const history = getHistoryFromStorage();
+        const historyList = document.querySelector('.history-list');
+
+        historyList.innerHTML = '';
+
+        if (history.length === 0) {
+            historyList.innerHTML = '<div class="p-3 text-center text-muted">Query history is Empty</div>';
+            return;
+        }
+
+        history.forEach(function(item, index) {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <div class="history-question">${item.question}</div>
+                <div class="history-sql">${item.sql}</div>
+                <small class="text-muted">${formatDate(item.timestamp)}</small>
+            `;
+
+            historyItem.addEventListener('click', function() {
+                document.getElementById('question').value = item.question;
+                document.getElementById('question').focus();
+            });
+
+            historyList.appendChild(historyItem);
+        });
+    }
+
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleString();
+    }
+
+    updateHistoryUI();
+
+    if (document.querySelector('.result-table') || document.getElementById('sqlCode')) {
+        document.getElementById('resultsContainer').style.display = 'block';
+    }
+</script>
+</body>
+</html>

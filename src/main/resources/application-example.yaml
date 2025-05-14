@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: SpringAI
+  ai:
+    openai:
+      api-key: sk-...
+      chat:
+        options:
+          model: gpt-3.5-turbo
+  datasource:
+    url: jdbc:postgresql://db:5432/your_database
+    username: username
+    password: password
